@@ -1,0 +1,41 @@
+{
+  "name": "diary-drawers",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "studio": "sanity dev"
+  },
+  "dependencies": {
+    "@portabletext/react": "^6.0.2",
+    "@portabletext/types": "^4.0.1",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-select": "^2.2.6",
+    "@sanity/client": "^7.13.2",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.26",
+    "groq": "^5.1.0",
+    "next": "^16.1.1",
+    "next-sanity": "^12.0.8",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@sanity/cli": "^5.1.0",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^20.19.27",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^8",
+    "eslint-config-next": "^14.2.0",
+    "postcss": "^8.5.6",
+    "sanity": "^5.1.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   CSS RESET LAYER
+   ============================================ */
+@layer base {
+  /* Modern CSS Reset */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -moz-tab-size: 4;
+    tab-size: 4;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+  }
+
+  /* Remove default margins */
+  h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd {
+    margin: 0;
+  }
+
+  /* Lists */
+  ul, ol {
+    list-style: none;
+  }
+
+  /* Links */
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.125em;
+    transition: text-decoration-color 150ms ease;
+  }
+
+  a:hover,
+  a:focus-visible {
+    text-decoration-color: transparent;
+  }
+
+  /* Images */
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Form elements */
+  input, button, textarea, select {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.75rem;
+  }
+
+  h4 {
+    font-size: 1.5rem;
+  }
+
+  h5 {
+    font-size: 1.25rem;
+  }
+
+  h6 {
+    font-size: 1.125rem;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  /* Code */
+  code {
+    font-family: ui-monospace, 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  pre {
+    overflow-x: auto;
+  }
+
+  /* Blockquote */
+  blockquote {
+    border-left: 4px solid var(--color-border);
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: var(--color-foreground-muted);
+  }
+}
+
+/* ============================================
+   DESIGN TOKENS (CSS Variables)
+   ============================================ */
+:root {
+  /* Colors - Warm desk palette from photo */
+  --color-primary: #28211A;
+  --color-primary-foreground: #DDCAB0;
+  --color-secondary: #7D5924;
+  --color-secondary-foreground: #DDCAB0;
+  --color-background: #DDCAB0;
+  --color-background-muted: #E6D2B8;
+  --color-foreground: #28211A;
+  --color-foreground-muted: #3A4433;
+  --color-foreground-subtle: #7D5924;
+  --color-border: #3A4433;
+  --color-border-muted: #7D5924;
+  --color-accent: #CFA11A;
+  --color-accent-hover: #7D5924;
+  
+  /* Desk-specific colors */
+  --color-warm-wall: #DDCAB0;
+  --color-warm-wall-alt: #E6D2B8;
+  --color-mustard-dark: #7D5924;
+  --color-mustard-bright: #CFA11A;
+  --color-desk-dark: #28211A;
+  --color-plant-green: #3A4433;
+  --color-shadow-overlay: rgba(0, 0, 0, 0.45);
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Merriweather', Georgia, serif;
+
+  /* Spacing */
+  --max-width-content: 800px;
+  --max-width-prose: 700px;
+
+  /* Border radius */
+  --radius: 4px;
+
+  /* Transitions */
+  --transition-base: 150ms ease;
+  --transition-fast: 100ms ease;
+  --transition-slow: 300ms ease;
+}
+
+/* ============================================
+   UTILITY COMPONENTS
+   ============================================ */
+@layer components {
+  /* Skip Navigation */
+  .skip-nav {
+    position: absolute;
+    top: -2.5rem;
+    left: 0;
+    z-index: 100;
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    transition: all var(--transition-base);
+  }
+
+  .skip-nav:focus {
+    top: 0;
+  }
+
+  /* Screen Reader Only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Main Content Container */
+  .main-content {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: var(--max-width-content);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  /* Prose Container */
+  .prose-container {
+    max-width: var(--max-width-prose);
+  }
+}
+
+/* ============================================
+   CUSTOM UTILITIES
+   ============================================ */
+@layer utilities {
+  /* Text balance for better readability */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Focus visible with better contrast */
+  .focus-ring {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+
+  /* Paper texture effect */
+  .paper-texture {
+    background-image: 
+      linear-gradient(90deg, transparent 79px, rgba(0,0,0,0.03) 81px, rgba(0,0,0,0.03) 82px, transparent 84px),
+      linear-gradient(var(--color-warm-wall) 0.1em, transparent 0.1em);
+    background-size: 100% 1.5em;
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-6 {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
