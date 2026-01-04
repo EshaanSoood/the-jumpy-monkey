@@ -33,6 +33,27 @@ export function DrawerRing({ drawers, drawerEntries }: DrawerRingProps) {
     }
   }
 
+  // ESC key to close drawer
+  useEffect(() => {
+    if (!openDrawerId) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        const previousId = openDrawerId
+        setOpenDrawerId(null)
+        // Return focus to the handle that opened it
+        setTimeout(() => {
+          if (previousId && drawerRefs.current[previousId]) {
+            drawerRefs.current[previousId]?.focus()
+          }
+        }, 0)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [openDrawerId])
+
   // Focus trap and keyboard handling
   useEffect(() => {
     if (!openDrawerId || !panelRef.current) return
@@ -45,11 +66,6 @@ export function DrawerRing({ drawers, drawerEntries }: DrawerRingProps) {
     const lastElement = focusableElements[focusableElements.length - 1]
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        closeDrawer()
-        return
-      }
-
       if (event.key === 'Tab') {
         if (event.shiftKey) {
           if (document.activeElement === firstElement) {
@@ -242,23 +258,18 @@ const DrawerPanel = forwardRef<HTMLDivElement, DrawerPanelProps>(
       if (canGoNext) setCurrentEntryIndex(currentEntryIndex + 1)
     }
 
-    // Determine slide direction based on drawer position
-    // For simplicity, left drawers slide from left, right from right
-    // We'll use order to determine: lower order = left side
-    const slideDirection = (drawer.order || 0) <= 3 ? -1 : 1
-
     const panelVariants = {
       hidden: {
-        x: slideDirection > 0 ? '100%' : '-100%',
         opacity: 0,
+        scale: 0.95,
       },
       visible: {
-        x: 0,
         opacity: 1,
+        scale: 1,
       },
       exit: {
-        x: slideDirection > 0 ? '100%' : '-100%',
         opacity: 0,
+        scale: 0.95,
       },
     }
 
@@ -278,31 +289,40 @@ const DrawerPanel = forwardRef<HTMLDivElement, DrawerPanelProps>(
         animate="visible"
         exit="exit"
         transition={transition}
-        className="fixed right-0 top-0 z-40 h-full w-full max-w-md bg-[var(--color-warm-wall-alt)] shadow-2xl lg:max-w-lg"
-        style={{
-          boxShadow: '-4px 0 24px rgba(0,0,0,0.4)',
-        }}
+        className="fixed inset-0 z-50 bg-black bg-opacity-80 flex items-center justify-center p-4"
+        onClick={onClose}
       >
-        <div className="flex h-full flex-col">
-          {/* Header */}
-          <header className="border-b border-border-muted p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-foreground">{drawer.name}</h2>
-              <button
-                onClick={onClose}
-                aria-label="Close drawer"
-                className="rounded p-2 text-foreground transition-colors hover:bg-border focus-ring"
-              >
-                ✕
-              </button>
-            </div>
-            {drawer.description && (
-              <p className="mt-2 text-sm text-foreground-muted">{drawer.description}</p>
-            )}
-          </header>
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={transition}
+          className="relative max-h-full w-full max-w-4xl bg-[var(--color-warm-wall-alt)] shadow-2xl rounded-lg overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            boxShadow: '-4px 0 24px rgba(0,0,0,0.4)',
+          }}
+        >
+          <div className="flex h-full max-h-[90vh] flex-col">
+            {/* Header */}
+            <header className="border-b border-border-muted p-6 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-foreground">{drawer.name}</h2>
+                <button
+                  onClick={onClose}
+                  aria-label="Close drawer"
+                  className="rounded p-2 text-foreground transition-colors hover:bg-border focus-ring"
+                >
+                  ✕
+                </button>
+              </div>
+              {drawer.description && (
+                <p className="mt-2 text-sm text-foreground-muted">{drawer.description}</p>
+              )}
+            </header>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6">
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
             {entries.length === 0 ? (
               <p className="text-foreground-muted">No entries in this drawer yet.</p>
             ) : (
@@ -361,8 +381,9 @@ const DrawerPanel = forwardRef<HTMLDivElement, DrawerPanelProps>(
                 )}
               </>
             )}
+            </div>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     )
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion'
 import Image from 'next/image'
@@ -20,6 +20,8 @@ interface PostcardArchiveProps {
 
 export function PostcardArchive({ postcards, onSelectPostcard }: PostcardArchiveProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [fullscreenPostcard, setFullscreenPostcard] = useState<Postcard | null>(null)
+  const fullscreenRef = useRef<HTMLDivElement | null>(null)
   const reducedMotion = useReducedMotion()
 
   // Always render the section for screen reader discovery, even if empty
@@ -46,10 +48,60 @@ export function PostcardArchive({ postcards, onSelectPostcard }: PostcardArchive
     if (onSelectPostcard) {
       onSelectPostcard(postcard)
     } else {
-      // Default: expand to show archive
-      setIsExpanded(true)
+      // Open in fullscreen modal
+      setFullscreenPostcard(postcard)
+      setIsExpanded(false)
     }
   }
+
+  // ESC key to close fullscreen
+  useEffect(() => {
+    if (!fullscreenPostcard) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setFullscreenPostcard(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [fullscreenPostcard])
+
+  // Focus trap for fullscreen modal
+  useEffect(() => {
+    if (!fullscreenPostcard || !fullscreenRef.current) return
+
+    const modal = fullscreenRef.current
+    const focusableElements = modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    const firstElement = focusableElements[0]
+    const lastElement = focusableElements[focusableElements.length - 1]
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            event.preventDefault()
+            lastElement?.focus()
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            event.preventDefault()
+            firstElement?.focus()
+          }
+        }
+      }
+    }
+
+    modal.addEventListener('keydown', handleKeyDown)
+    firstElement?.focus()
+
+    return () => {
+      modal.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [fullscreenPostcard])
 
   return (
     <section
@@ -148,12 +200,8 @@ export function PostcardArchive({ postcards, onSelectPostcard }: PostcardArchive
           <ul className="space-y-3 max-h-96 overflow-y-auto">
             {postcards.map((postcard) => (
               <li key={postcard._id}>
-                <button
-                  onClick={() => {
-                    if (onSelectPostcard) {
-                      onSelectPostcard(postcard)
-                    }
-                  }}
+                  <button
+                  onClick={() => handlePostcardClick(postcard)}
                   className="flex w-full items-center gap-3 rounded p-2 text-left transition-colors hover:bg-border focus-ring"
                 >
                   <div className="relative h-16 w-20 flex-shrink-0 overflow-hidden rounded bg-white">
@@ -179,6 +227,63 @@ export function PostcardArchive({ postcards, onSelectPostcard }: PostcardArchive
           </ul>
         </motion.div>
       )}
+
+      {/* Fullscreen postcard modal */}
+      <AnimatePresence>
+        {fullscreenPostcard && (
+          <motion.div
+            ref={fullscreenRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Postcard: ${fullscreenPostcard.label || new Date(fullscreenPostcard.date).toLocaleDateString()}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={transition}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
+            onClick={() => setFullscreenPostcard(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={transition}
+              className="relative max-h-full w-full max-w-4xl overflow-hidden rounded-lg bg-background-muted shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setFullscreenPostcard(null)}
+                aria-label="Close fullscreen view"
+                className="absolute right-4 top-4 z-10 rounded bg-background-muted p-2 text-foreground shadow-lg transition-colors hover:bg-border focus-ring"
+              >
+                ✕
+              </button>
+              <div className="relative aspect-video w-full bg-white">
+                <Image
+                  src={fullscreenPostcard.imageUrl}
+                  alt={fullscreenPostcard.label || `Postcard from ${new Date(fullscreenPostcard.date).toLocaleDateString()}`}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+              {(fullscreenPostcard.label || fullscreenPostcard.date) && (
+                <div className="p-6">
+                  {fullscreenPostcard.label && (
+                    <h3 className="text-xl font-semibold text-foreground">{fullscreenPostcard.label}</h3>
+                  )}
+                  {fullscreenPostcard.date && (
+                    <p className="mt-2 text-sm text-foreground-muted font-mono">
+                      {new Date(fullscreenPostcard.date).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

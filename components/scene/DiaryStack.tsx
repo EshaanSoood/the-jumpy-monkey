@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion'
 import { formatDate } from '@/lib/utils/date'
@@ -14,6 +14,8 @@ interface DiaryStackProps {
 
 export function DiaryStack({ entries, initialIndex = 0 }: DiaryStackProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const fullscreenRef = useRef<HTMLDivElement | null>(null)
   const reducedMotion = useReducedMotion()
 
   // Ensure we have at least 3 entries (pad with nulls if needed)
@@ -73,6 +75,55 @@ export function DiaryStack({ entries, initialIndex = 0 }: DiaryStackProps) {
     window.addEventListener('wheel', handleWheel, { passive: false })
     return () => window.removeEventListener('wheel', handleWheel)
   }, [canGoPrevious, canGoNext])
+
+  // ESC key to close fullscreen
+  useEffect(() => {
+    if (!isFullscreen) return
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsFullscreen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isFullscreen])
+
+  // Focus trap for fullscreen modal
+  useEffect(() => {
+    if (!isFullscreen || !fullscreenRef.current) return
+
+    const modal = fullscreenRef.current
+    const focusableElements = modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    const firstElement = focusableElements[0]
+    const lastElement = focusableElements[focusableElements.length - 1]
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            event.preventDefault()
+            lastElement?.focus()
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            event.preventDefault()
+            firstElement?.focus()
+          }
+        }
+      }
+    }
+
+    modal.addEventListener('keydown', handleKeyDown)
+    firstElement?.focus()
+
+    return () => {
+      modal.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isFullscreen])
 
   if (!currentEntry) {
     return (
@@ -177,6 +228,7 @@ export function DiaryStack({ entries, initialIndex = 0 }: DiaryStackProps) {
               entry={currentEntry} 
               isPeek={false}
               position="current"
+              onFullscreen={() => setIsFullscreen(true)}
             />
           </motion.div>
         </AnimatePresence>
@@ -200,6 +252,53 @@ export function DiaryStack({ entries, initialIndex = 0 }: DiaryStackProps) {
         Showing entry dated {formatDate(currentEntry.date)}
         {currentEntry.title && `: ${currentEntry.title}`}
       </div>
+
+      {/* Fullscreen modal */}
+      <AnimatePresence>
+        {isFullscreen && (
+          <motion.div
+            ref={fullscreenRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Diary entry: ${currentEntry.title || formatDate(currentEntry.date)}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={transition}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 p-4"
+            onClick={() => setIsFullscreen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={transition}
+              className="relative max-h-full w-full max-w-4xl overflow-y-auto rounded-lg bg-[var(--color-warm-wall)] p-8 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundImage: `
+                  linear-gradient(90deg, transparent 79px, rgba(0,0,0,0.03) 81px, rgba(0,0,0,0.03) 82px, transparent 84px),
+                  linear-gradient(var(--color-warm-wall) 0.1em, transparent 0.1em)
+                `,
+                backgroundSize: '100% 1.5em',
+              }}
+            >
+              <button
+                onClick={() => setIsFullscreen(false)}
+                aria-label="Close fullscreen view"
+                className="absolute right-4 top-4 rounded p-2 text-foreground transition-colors hover:bg-border focus-ring"
+              >
+                ✕
+              </button>
+              <DiaryCard 
+                entry={currentEntry} 
+                isPeek={false}
+                position="current"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   )
 }
@@ -208,9 +307,10 @@ interface DiaryCardProps {
   entry: DiaryEntryWithDrawers
   isPeek: boolean
   position: 'previous' | 'current' | 'next'
+  onFullscreen?: () => void
 }
 
-function DiaryCard({ entry, isPeek, position }: DiaryCardProps) {
+function DiaryCard({ entry, isPeek, position, onFullscreen }: DiaryCardProps) {
   const dateStr = formatDate(entry.date)
   const reducedMotion = useReducedMotion()
 
@@ -219,7 +319,8 @@ function DiaryCard({ entry, isPeek, position }: DiaryCardProps) {
 
   return (
     <article
-      className="relative rounded-lg bg-[var(--color-warm-wall)] p-8 shadow-2xl"
+      className={`relative rounded-lg bg-[var(--color-warm-wall)] p-8 shadow-2xl ${!isPeek && onFullscreen ? 'cursor-pointer' : ''}`}
+      onClick={!isPeek && onFullscreen ? onFullscreen : undefined}
       style={{
         transform: `rotate(${rotation}deg)`,
         // Paper texture effect with subtle noise
