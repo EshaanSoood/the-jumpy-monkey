@@ -61,8 +61,8 @@ export function MomentPhoto({ imageUrl, caption, date }: MomentPhotoProps) {
   }
 
   const transition = reducedMotion
-    ? { duration: 0.01 }
-    : { type: 'spring', stiffness: 300, damping: 25 }
+    ? { duration: 0.01 } as const
+    : { type: 'spring' as const, stiffness: 300, damping: 25 }
 
   return (
     <>

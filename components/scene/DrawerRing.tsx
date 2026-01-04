@@ -147,7 +147,9 @@ export function DrawerRing({ drawers, drawerEntries }: DrawerRingProps) {
               drawer={drawer}
               isOpen={openDrawerId === drawer._id}
               onOpen={() => openDrawer(drawer._id)}
-              ref={(el) => (drawerRefs.current[drawer._id] = el)}
+              ref={(el) => {
+                drawerRefs.current[drawer._id] = el
+              }}
             />
           ))}
         </div>
@@ -160,7 +162,9 @@ export function DrawerRing({ drawers, drawerEntries }: DrawerRingProps) {
               drawer={drawer}
               isOpen={openDrawerId === drawer._id}
               onOpen={() => openDrawer(drawer._id)}
-              ref={(el) => (drawerRefs.current[drawer._id] = el)}
+              ref={(el) => {
+                drawerRefs.current[drawer._id] = el
+              }}
             />
           ))}
         </div>
@@ -253,8 +257,8 @@ const DrawerPanel = forwardRef<HTMLDivElement, DrawerPanelProps>(
     }
 
     const transition = reducedMotion
-      ? { duration: 0.01 }
-      : { type: 'spring', stiffness: 300, damping: 30 }
+      ? { duration: 0.01 } as const
+      : { type: 'spring' as const, stiffness: 300, damping: 30 }
 
     return (
       <motion.div

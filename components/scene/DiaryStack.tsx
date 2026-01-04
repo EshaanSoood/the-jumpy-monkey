@@ -117,8 +117,8 @@ export function DiaryStack({ entries, initialIndex = 0 }: DiaryStackProps) {
   }
 
   const transition = reducedMotion
-    ? { duration: 0.01 }
-    : { type: 'spring', stiffness: 300, damping: 30 }
+    ? { duration: 0.01 } as const
+    : { type: 'spring' as const, stiffness: 300, damping: 30 }
 
   return (
     <main 
