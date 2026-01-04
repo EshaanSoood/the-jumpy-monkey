@@ -76,10 +76,8 @@ export default async function Home() {
           />
         )}
 
-        {/* Postcard archive (under moment photo) */}
-        {allMoments.length > 0 && (
-          <PostcardArchive postcards={allMoments} />
-        )}
+        {/* Postcard archive (under moment photo) - always render for accessibility */}
+        <PostcardArchive postcards={allMoments} />
 
         {/* Diary stack (center) */}
         {entries.length > 0 ? (
@@ -93,10 +91,8 @@ export default async function Home() {
           </main>
         )}
 
-        {/* Drawer ring (around diary) */}
-        {drawers.length > 0 && (
-          <DrawerRing drawers={drawers} drawerEntries={drawerEntriesMap} />
-        )}
+        {/* Drawer ring (around diary) - always render for accessibility */}
+        <DrawerRing drawers={drawers} drawerEntries={drawerEntriesMap} />
       </div>
     </div>
   )

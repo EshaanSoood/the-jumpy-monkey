@@ -98,18 +98,22 @@ export function DrawerRing({ drawers, drawerEntries }: DrawerRingProps) {
   // Desktop layout: position drawers around diary
   // Mobile: single button that opens a menu
   return (
-    <>
-      {/* Mobile: Single drawer button */}
-      <div className="fixed top-4 right-4 z-30 lg:hidden">
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Open drawers menu"
-          aria-expanded={mobileMenuOpen}
-          className="rounded-lg bg-background-muted px-4 py-2 font-medium text-foreground shadow-lg transition-colors hover:bg-border focus-ring"
-        >
-          Drawers {mobileMenuOpen ? '✕' : '☰'}
-        </button>
-      </div>
+    <nav aria-label="Drawers navigation" className="fixed inset-0 pointer-events-none z-20">
+      {drawers.length === 0 ? (
+        <div className="sr-only">No drawers available</div>
+      ) : (
+        <>
+          {/* Mobile: Single drawer button */}
+          <div className="fixed top-4 right-4 z-30 lg:hidden pointer-events-auto">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={`Open drawers menu${drawers.length > 0 ? `, ${drawers.length} drawer${drawers.length === 1 ? '' : 's'} available` : ''}`}
+              aria-expanded={mobileMenuOpen}
+              className="rounded-lg bg-background-muted px-4 py-2 font-medium text-foreground shadow-lg transition-colors hover:bg-border focus-ring"
+            >
+              Drawers {mobileMenuOpen ? '✕' : '☰'}
+            </button>
+          </div>
 
       {/* Mobile drawer menu */}
       <AnimatePresence>
@@ -182,7 +186,9 @@ export function DrawerRing({ drawers, drawerEntries }: DrawerRingProps) {
           />
         )}
       </AnimatePresence>
-    </>
+        </>
+      )}
+    </nav>
   )
 }
 

@@ -22,8 +22,16 @@ export function PostcardArchive({ postcards, onSelectPostcard }: PostcardArchive
   const [isExpanded, setIsExpanded] = useState(false)
   const reducedMotion = useReducedMotion()
 
+  // Always render the section for screen reader discovery, even if empty
   if (postcards.length === 0) {
-    return null
+    return (
+      <section
+        aria-label="Postcard archive"
+        className="fixed bottom-8 left-8 z-20 lg:bottom-16 lg:left-16"
+      >
+        <div className="sr-only">Postcard archive (empty)</div>
+      </section>
+    )
   }
 
   // Show top 5-7 postcards in stack
