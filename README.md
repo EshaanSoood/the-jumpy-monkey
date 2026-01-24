@@ -1,129 +1,35 @@
-# Diary + Drawers
+# Link in Bio - Eshaan Sood
 
-A personal website that functions as a thinking surface, temporal record, and navigable memory.
+A simple, single-page link-in-bio website hosted on GitHub Pages.
 
-## Project Status
+## Setup for GitHub Pages
 
-**Phase 0: Foundation & Setup** ✅ Complete
-- Next.js 16 with TypeScript
-- Sanity client configured
-- Accessibility foundation (skip navigation)
-- Project structure established
+1. Push this repository to GitHub
+2. Go to your repository settings on GitHub
+3. Navigate to "Pages" in the left sidebar
+4. Under "Source", select the branch (usually `main`) and folder (`/` root)
+5. Click "Save"
+6. Your site will be available at `https://[your-username].github.io/[repository-name]/`
 
-**Phase 1: Content Schema & CMS** ✅ Complete
-- Sanity schemas for Drawer and Diary Entry
-- Sanity Studio integrated
-- GROQ queries defined
-- TypeScript types created
-- Data fetching helpers ready
+## Local Development
 
-**Phase 2: Core Data Layer** ✅ Complete
-- All GROQ queries implemented
-- Type-safe data fetching functions
-- Error handling for missing Sanity config
-
-**Phase 3: Diary Layer (MVP)** ✅ Complete
-- Diary list page with chronological entries
-- Diary entry detail pages
-- Previous/Next navigation
-- PortableText rendering for rich content
-- Accessible markup and keyboard navigation
-- Responsive CSS styling
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-- Sanity account (free tier works)
-
-### Installation
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Set up Sanity:
-   - Create a new Sanity project at [sanity.io](https://www.sanity.io)
-   - Get your project ID from the Sanity dashboard
-   - Create a `.env.local` file in the root directory:
-   ```
-   NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_SANITY_DATASET=production
-   ```
-
-3. Initialize Sanity (if needed):
-```bash
-npx sanity init
-```
-   - Follow the prompts to link your project
-   - The schemas are already defined in `/sanity/schemas`
-
-### Development
-
-Run the development server:
+Simply open `index.html` in your browser or use a local server:
 
 ```bash
-npm run dev
+# Using Python
+python -m http.server 8000
+
+# Using Node.js (http-server)
+npx http-server
+
+# Using PHP
+php -S localhost:8000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Then visit `http://localhost:8000` in your browser.
 
-Access Sanity Studio at [http://localhost:3000/studio](http://localhost:3000/studio) to manage content.
+## Customization
 
-Alternatively, run Sanity Studio standalone:
-
-```bash
-npm run studio
-```
-
-### Build
-
-Build for production:
-
-```bash
-npm run build
-npm start
-```
-
-## Project Structure
-
-```
-/app              # Next.js App Router pages
-/components       # React components
-  /ui            # Accessible UI primitives
-  /diary         # Diary-related components
-  /drawers       # Drawer-related components
-/lib
-  /sanity        # Sanity client and queries
-  /utils         # Utility functions
-/types           # TypeScript type definitions
-```
-
-## Next Steps
-
-See `IMPLEMENTATION_PLAN.md` for the full development roadmap.
-
-**Phase 1** (Next): Set up Sanity schemas for Diary Entries and Drawers.
-
-## Accessibility
-
-This project prioritizes accessibility:
-- Semantic HTML structure
-- Keyboard navigation support
-- Screen reader compatibility
-- Skip navigation links
-- ARIA landmarks
-
-## Tech Stack
-
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **CMS**: Sanity (headless)
-- **UI Primitives**: Radix UI
-- **Styling**: CSS-first approach
-- **Date Handling**: date-fns
-- **Motion**: Framer Motion (optional)
-
+- Update the links in the `.links` section with your actual URLs
+- Update the social media links in the footer with your profiles
+- Modify the CSS variables in the `:root` selector to change the color scheme
